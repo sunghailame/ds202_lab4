@@ -42,6 +42,29 @@ The three Excel sheets are loaded into R but they are not useful to us before so
 3. Separate the `Height` column into two columns. Make sure the newly created columns are numeric. Then create one column that represents `Height` (Hint: Use a unit that works well). Drop any irrelavant columns from this process. 
 4. By cleaning the three data frames in R, at the end of this step you should have the following three clean data frames: `defClean`, `offClean`, and `bioClean`. Print the structures of these data frames. **Make sure your data types make sense for each variable.**
 
+```{r}
+library(dplyr)
+library(tidyverse)
+#player names and opponent names are factors
+bio$Name <- as.factor(bio$Name)
+defense$Name <- as.factor(defense$Name)
+offense$Name <- as.factor(offense$Name)
+defense$Opponent_Opponent <- as.factor(defense$Opponent_Opponent)
+offense$Opponent_Opponent <- as.factor(offense$Opponent_Opponent)
+#offensive and defensive statistics are numerical. 'Weight' column in biography is also numeric.
+defense <- mutate_at(defense, 3:11, as.numeric)
+offense <- mutate_at(offense, 3:12, as.numeric)
+bio$Weight <- as.numeric(bio$Weight)
+#separate 'height' column into two columns
+bioClean = bio %>% separate(Height, c("Feet", "Inches"))
+bioClean$Feet = as.numeric(bioClean$Feet)
+bioClean$Inches = as.numeric(bioClean$Inches)
+bioClean$Height = bio$Height
+defClean = defense
+offClean = offense
+```
+
+
 ## Part two: Tidying (A)
 For the following questions, work on the cleaned data frames `defClean`, `offClean`, and `bioClean`.
 
