@@ -123,7 +123,7 @@ ggplot(bioClean, aes(x=State, group = State)) + geom_bar() + labs(title = "Numbe
 offClean = offClean %>%
   left_join(bioClean, by=c("Name"))
 offClean_Players = offClean %>% group_by(Name) %>% select(State)
-head(offClean_Players)
+offClean_Players
 ```
 
 2. Is there a relationship between the weight of a player and the receiving yards (`Receiving_YDS`)?
@@ -139,6 +139,7 @@ Question: Does the height of a player affect the receiving frequency?
 offClean$Feet = as.numeric(offClean$Feet)
 ggplot(offClean, aes(Feet, Receiving_REC)) + geom_point() + labs(title = "Height of player and receiving frequency", x = "Height of a player", y = "Receiving frequency")
 ```
+
 - It seems like the height of a player does not really affect the frequency of receiving points.
 
 ## Tips
