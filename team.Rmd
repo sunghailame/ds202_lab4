@@ -69,12 +69,39 @@ offClean = offense
 For the following questions, work on the cleaned data frames `defClean`, `offClean`, and `bioClean`.
 
 1. Reformat the `defClean` data frame into a tidy format using `gather`. The type of statistic (Tackles_Solo, Tackles_ASST, etc) is added as a **new key column named `Statistic`.** 
-2. Create a histogram for each defensive statistic (make sure to explore different binwidths). Use `facet_wrap` to draw all histograms in a single plot. What defensive skills are rare?
-3. Did ISU have better defense against West Virginia or Kansas State? Answer this question by creating a scatterplot with x-axis being the number of solo tackles (by each player) against West Virginia, and y-axis being that against Kansas State. A large number of solo tackles indicates good defense. 
+```{r}
+library(dplyr)
+library(tidyverse)
+defClean = defClean %>%
+gather(key = "Statistic", value = frequency,"Tackles_Solo", "Tackles_ASST", "Tackles_TFL", "Tackles_Sack", "Turnover_FF", "Turnover_FR", "Turnover_INT", "Pass_QBH", "Pass_PB", na.rm = FALSE, convert = TRUE, factor_key = FALSE)
+```
 
-      (**Hint**: From step 1 we have gathered our `defClean` into 4 columns. \
+
+2. Create a histogram for each defensive statistic (make sure to explore different binwidths). Use `facet_wrap` to draw all histograms in a single plot. What defensive skills are rare?
+```{r}
+ggplot(defClean, aes(frequency)) + geom_histogram(binwidth = 0.5, breaks=seq(0,6,by=1)) + facet_wrap(~Statistic) + labs(title="Histogram of ISU Football Defensive Statistics", x="Value", y="Count")
+```
+#From these histograms we see that turnovers are rare for defense. 
+
+3. Did ISU have better defense against West Virginia or Kansas State? Answer this question by creating a scatterplot with x-axis being the number of solo tackles (by each player) against West Virginia, and y-axis being that against Kansas State. A large number of solo tackles indicates good defense.
+```{r}
+library(dplyr)
+library(tidyverse)
+#defClean = defClean %>% filter(frequency=="Tackles_Solo")
+#defClean = defClean %>% filter(Opponent_Opponent==`West Virginia`|Opponent_Opponent==`Kansas State`)
+#defClean = defClean %>% spread(key=Opponent_Opponent, value=frequency)
+#ggplot(defClean, aes(x=`West Virginia`,y=`Kansas State`))+geom_point()+labs(title="Solo Tackles vs. West Virginia and Kansas State")
+```
+
+
+(**Hint**: From step 1 we have gathered our `defClean` into 4 columns. \
        Now we only want to focus on solo tackles (hint...`filter`). 
       Look at your data structure. What form do we need our data to have in order to easily answer this question? (hint...`spread`)). 
+
+```{r}
+defClean
+offClean
+```
 
 ## Part two: Tidying  (B)
 Now let's turn our attention to the player biography `bioClean`.
