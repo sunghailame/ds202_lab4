@@ -89,7 +89,7 @@ library(dplyr)
 library(tidyverse)
 defClean = defClean %>% filter(frequency=="Tackles_Solo")
 defClean = defClean %>% filter(Opponent_Opponent==`West Virginia`|Opponent_Opponent==`Kansas State`)
-defClean = defClean %>% spread(key=Opponent_Opponent, value=amount)
+defClean = defClean %>% spread(key=Opponent_Opponent, value=frequency)
 ggplot(defClean, aes(x=`West Virginia`,y=`Kansas State`))+geom_point()+labs(title="Solo Tackles vs. West Virginia and Kansas State")
 ```
 
