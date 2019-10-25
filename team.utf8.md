@@ -5,9 +5,7 @@ date: "10/21/2019"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+
 
 ## Background
 An excerpt of the individual player data of the Cyclone football team is available from Canvas. Dowload the [excel file](cyclonesFootball2018.xlsx) and put the file next to your Rmd files. 
@@ -23,16 +21,29 @@ Some abbreviations for the column names can be found in the Glossaries sheet in 
 
 The Cyclone football data involves multiple Excel sheets and is in a somewhat messy form. The following code loads the Defensive sheet into R. **For this lab, also import the Offensive and the Biography sheets.**
 
-```{r}
+
+```r
 library(readxl)
 defense <- read_excel('cyclonesFootball2018.xlsx', sheet='Defensive')
 str(defense)
 ```
 
-```{r,echo=FALSE,results='hide'}
-offense <- read_excel('cyclonesFootball2018.xlsx', sheet='Offensive')
-bio <- read_excel('cyclonesFootball2018.xlsx', sheet='Biography')
 ```
+## Classes 'tbl_df', 'tbl' and 'data.frame':	446 obs. of  11 variables:
+##  $ Name             : chr  "Eisworth, Greg" "Eisworth, Greg" "Eisworth, Greg" "Eisworth, Greg" ...
+##  $ Opponent_Opponent: chr  "Iowa" "Oklahoma" "Akron" "TCU" ...
+##  $ Tackles_Solo     : chr  "3" "6" "7" "6" ...
+##  $ Tackles_ASST     : chr  "3" "8" "2" "3" ...
+##  $ Tackles_TFL      : chr  "0" "1.0" "1.0" "0" ...
+##  $ Tackles_Sack     : chr  "0" "0" "0" "0" ...
+##  $ Turnover_FF      : chr  "0" "1" "0" "0" ...
+##  $ Turnover_FR      : chr  "0" "0" "0" "0" ...
+##  $ Turnover_INT     : chr  "0" "0" "0" "0" ...
+##  $ Pass_QBH         : chr  "0" "0" "0" "0" ...
+##  $ Pass_PB          : chr  "0" "0" "3" "0" ...
+```
+
+
 
 ## Part one: Cleaning data
 The three Excel sheets are loaded into R but they are not useful to us before some cleaning. Manipulate the three imported data frames, so that the cleaned data satisfy the following:
@@ -42,9 +53,50 @@ The three Excel sheets are loaded into R but they are not useful to us before so
 3. Separate the `Height` column into two columns. Make sure the newly created columns are numeric. Then create one column that represents `Height` (Hint: Use a unit that works well). Drop any irrelavant columns from this process. 
 4. By cleaning the three data frames in R, at the end of this step you should have the following three clean data frames: `defClean`, `offClean`, and `bioClean`. Print the structures of these data frames. **Make sure your data types make sense for each variable.**
 
-```{r}
+
+```r
 library(dplyr)
+```
+
+```
+## 
+## Attaching package: 'dplyr'
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+```r
 library(tidyverse)
+```
+
+```
+## -- Attaching packages ---------------------------------------------- tidyverse 1.2.1 --
+```
+
+```
+## v ggplot2 3.2.1     v readr   1.3.1
+## v tibble  2.1.3     v purrr   0.3.2
+## v tidyr   0.8.3     v stringr 1.4.0
+## v ggplot2 3.2.1     v forcats 0.4.0
+```
+
+```
+## -- Conflicts ------------------------------------------------- tidyverse_conflicts() --
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()
+```
+
+```r
 #player names and opponent names are factors
 bio$Name <- as.factor(bio$Name)
 defense$Name <- as.factor(defense$Name)
@@ -54,6 +106,13 @@ offense$Opponent_Opponent <- as.factor(offense$Opponent_Opponent)
 #offensive and defensive statistics are numerical. 'Weight' column in biography is also numeric.
 defense <- mutate_at(defense, 3:11, as.numeric)
 offense <- mutate_at(offense, 3:12, as.numeric)
+```
+
+```
+## Warning: NAs introduced by coercion
+```
+
+```r
 bio$Weight <- as.numeric(bio$Weight)
 #separate 'height' column into two columns
 bioClean = bio %>% separate(Height, c("Feet", "Inches"))
@@ -69,7 +128,8 @@ offClean = offense
 For the following questions, work on the cleaned data frames `defClean`, `offClean`, and `bioClean`.
 
 1. Reformat the `defClean` data frame into a tidy format using `gather`. The type of statistic (Tackles_Solo, Tackles_ASST, etc) is added as a **new key column named `Statistic`.** 
-```{r}
+
+```r
 library(dplyr)
 library(tidyverse)
 defClean = defClean %>%
@@ -78,13 +138,17 @@ gather(key = "Statistic", value = "Frequency","Tackles_Solo", "Tackles_ASST", "T
 
 
 2. Create a histogram for each defensive statistic (make sure to explore different binwidths). Use `facet_wrap` to draw all histograms in a single plot. What defensive skills are rare?
-```{r}
+
+```r
 ggplot(defClean, aes(Frequency)) + geom_histogram(binwidth = 0.5, breaks=seq(0,6,by=1)) + facet_wrap(~Statistic) + labs(title="Histogram of ISU Football Defensive Statistics", x="Value", y="Count")
 ```
+
+<img src="team_files/figure-html/unnamed-chunk-5-1.png" width="672" />
 - From these histograms we see that turnovers are rare for defense. 
 
 3. Did ISU have better defense against West Virginia or Kansas State? Answer this question by creating a scatterplot with x-axis being the number of solo tackles (by each player) against West Virginia, and y-axis being that against Kansas State. A large number of solo tackles indicates good defense.
-```{r}
+
+```r
 library(dplyr)
 library(tidyverse)
 
@@ -92,8 +156,13 @@ defClean = defClean %>% filter(Statistic == "Tackles_Solo" & Opponent_Opponent %
   spread(key = Statistic, value = Frequency)
 defClean = defClean %>% spread(key=Opponent_Opponent, value=Tackles_Solo)
 ggplot(defClean, aes(x=`West Virginia`,y=`Kansas State`))+geom_point()+labs(title="Solo Tackles against West Virginia and Kansas State")
+```
 
 ```
+## Warning: Removed 9 rows containing missing values (geom_point).
+```
+
+<img src="team_files/figure-html/unnamed-chunk-6-1.png" width="672" />
 - From the scatterplot, we can say that ISU had better defense against Kansas State by seeing the tackle value of more than 8.
 
 (**Hint**: From step 1 we have gathered our `defClean` into 4 columns. \
@@ -104,41 +173,100 @@ ggplot(defClean, aes(x=`West Virginia`,y=`Kansas State`))+geom_point()+labs(titl
 Now let's turn our attention to the player biography `bioClean`.
 
 1. Separate the `Hometown` column into two columns, namely the city and the state. Print the first few rows of these two columns. (Hint: look at the `sep=` argument of `separate`)
-```{r}
+
+```r
 bioClean = bioClean %>%
   separate(Hometown, c("City", "State"), sep=", ")
 head(bioClean)
 ```
+
+```
+## # A tibble: 6 x 10
+##   Name   Position   Feet Inches Weight Class  City  State Highschool Height
+##   <fct>  <chr>     <dbl>  <dbl>  <dbl> <chr>  <chr> <chr> <chr>      <chr> 
+## 1 Akers~ Wide Rec~     6      0    192 Redsh~ Ceda~ Iowa  Washington 6-0   
+## 2 Allen~ Tight End     6      7    240 Redsh~ Nixa  Mo.   Nixa       6-7   
+## 3 Alt, ~ Offensiv~     6      2    290 Redsh~ Ceda~ Iowa  Washington 6-2   
+## 4 Ander~ Tight End     6      4    250 Redsh~ Leag~ Texas Clear Fal~ 6-4   
+## 5 Assal~ Placekic~     6      0    191 Redsh~ Nape~ Ill.  Central    6-0   
+## 6 Austi~ Lineback~     5     11    205 Redsh~ Waln~ Cali~ Bishop Am~ 5-11
+```
 2. How many players are there from each state?
-```{r}
+
+```r
 ggplot(bioClean, aes(x=State, group = State)) + geom_bar() + labs(title = "Number of players from each state", x = "State", y="Number of Players")
 ```
+
+<img src="team_files/figure-html/unnamed-chunk-8-1.png" width="672" />
 
 
 
 ## Part three: Joining data frames
 
 1. Find out where the offensive players are from by joining the offensive data and player biography data appropriately.
-```{r}
+
+```r
 offClean = offClean %>%
   left_join(bioClean, by=c("Name"))
+```
+
+```
+## Warning: Column `Name` joining factors with different levels, coercing to
+## character vector
+```
+
+```r
 offClean_Players = offClean %>% group_by(Name) %>% select(State)
+```
+
+```
+## Adding missing grouping variables: `Name`
+```
+
+```r
 head(offClean_Players)
 ```
 
+```
+## # A tibble: 6 x 2
+## # Groups:   Name [1]
+##   Name             State
+##   <chr>            <chr>
+## 1 Jones, Deshaunte Ohio 
+## 2 Jones, Deshaunte Ohio 
+## 3 Jones, Deshaunte Ohio 
+## 4 Jones, Deshaunte Ohio 
+## 5 Jones, Deshaunte Ohio 
+## 6 Jones, Deshaunte Ohio
+```
+
 2. Is there a relationship between the weight of a player and the receiving yards (`Receiving_YDS`)?
-```{r}
+
+```r
 offClean$Weight = as.numeric(offClean$Weight)
 ggplot(offClean, aes(Weight, Receiving_YDS)) + geom_point() + labs(title = "Weight of player and receiving yards", x = "Weight of a player", y = "Receiving yards")
 ```
+
+```
+## Warning: Removed 20 rows containing missing values (geom_point).
+```
+
+<img src="team_files/figure-html/unnamed-chunk-10-1.png" width="672" />
 - From the above scatterplot, it seems like 225 lbs is the ideal weight for receiving yards since the players who are around that weight are performing well.
 
 3. Explore more. Raise a question that can be answered only by looking at two or more data frames. Then answer that question.
 Question: Does the height of a player affect the receiving frequency?
-```{r}
+
+```r
 offClean$Feet = as.numeric(offClean$Feet)
 ggplot(offClean, aes(Feet, Receiving_REC)) + geom_point() + labs(title = "Height of player and receiving frequency", x = "Height of a player", y = "Receiving frequency")
 ```
+
+```
+## Warning: Removed 20 rows containing missing values (geom_point).
+```
+
+<img src="team_files/figure-html/unnamed-chunk-11-1.png" width="672" />
 - It seems like the height of a player does not really affect the frequency of receiving points.
 
 ## Tips
