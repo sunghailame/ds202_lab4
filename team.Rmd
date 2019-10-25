@@ -8,6 +8,9 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+> Usernames: sunghailame, etimothy 
+
+> Repo name: ds202_lab4
 
 ## Background
 An excerpt of the individual player data of the Cyclone football team is available from Canvas. Dowload the [excel file](cyclonesFootball2018.xlsx) and put the file next to your Rmd files. 
